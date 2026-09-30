@@ -280,7 +280,6 @@ body.present #presentExit:hover{opacity:1}
   <section class="view" id="view-result">
     <div class="card">
       <h2>抽籤結果總覽</h2>
-      <p class="hint" id="resultHint"></p>
       <div class="actions noprint">
         <button class="btn primary" id="btnPresent">🖥 全螢幕展示（只顯示兩組＋背景）</button>
         <button class="btn" id="btnPrint">🖨 列印 / 儲存 PDF</button>
@@ -567,19 +566,11 @@ function colHtml(key){
     html+='<tr><td class="k">'+d.k+'</td><td class="nm">'+esc(d.name)+'</td><td>'+esc(d.topic)+'</td></tr>';
   });
   html+='</tbody></table>';
-  html+='<div class="meta">'+
-    (grp.saved? '<span class="stamp">已儲存 '+fmtDate(grp.savedAt)+'</span>' : '<span class="stamp todo">未儲存</span>')+
-    '　共 '+rows.length+' / 10 位　·　亂數種子 '+grp.seed+
-    '　·　名次'+(grp.order==="rand"?"隨機出場":"依 1→10 出場")+'／主題'+(grp.pair==="rand"?"隨機抽題":"跟出場序對應")+
-  '</div>';
   return html;
 }
 function renderResult(){
   $("colSenior").innerHTML=colHtml("senior");
   $("colJunior").innerHTML=colHtml("junior");
-  var a=S.groups.senior.saved, b=S.groups.junior.saved;
-  $("resultHint").textContent = (a&&b) ? "兩組抽籤已完成並儲存。可按「列印 / 儲存 PDF」出紙本，或截圖公佈。"
-    : "提示：兩組都抽完並按「儲存本組結果」之後，呢頁就會顯示兩組完整結果。";
 }
 function plainText(){
   var L=[];
