@@ -213,16 +213,16 @@ body.present #presentExit:hover{opacity:1}
   <!-- ① 設定 -->
   <section class="view" id="view-setup">
     <div class="card">
-      <h2>第 1 步：輸入本組名單（名次已預設 1–10，請填 10 個講解題目）</h2>
-      <p class="hint">名次欄已預設 1–10（可以直接用，或者逐格改成實際名次）。講解題目可以逐格打，或者用下面「批量貼上」一次過貼 10 行。</p>
+      <h2>第 1 步：輸入本組名單（名次已預設 1–10，請填 10 個講題主題）</h2>
+      <p class="hint">名次欄已預設 1–10（可以直接用，或者逐格改成實際名次）。講題主題可以逐格打，或者用下面「批量貼上」一次過貼 10 行。</p>
 
       <div class="opts">
-        <span style="font-size:13.5px;font-weight:700;color:#3d6b96">🎲 抽籤方式（已固定）：名次<b>隨機出場</b>　＋　題目<b>隨機抽題（10 題不重複）</b></span>
+        <span style="font-size:13.5px;font-weight:700;color:#3d6b96">🎲 抽籤方式（已固定）：名次<b>隨機出場</b>　＋　主題<b>隨機抽題（10 題不重複）</b></span>
         <label id="lockNote" class="locked" style="display:none">🔒 已開始抽籤，要改資料請先按「重新抽籤本組」</label>
       </div>
 
       <table class="tbl">
-        <thead><tr><th style="width:120px">名次</th><th>講解題目</th></tr></thead>
+        <thead><tr><th style="width:120px">名次</th><th>講題主題</th></tr></thead>
         <tbody id="tbodySetup"></tbody>
       </table>
 
@@ -233,15 +233,15 @@ body.present #presentExit:hover{opacity:1}
           <div class="row"><button class="btn" id="btnFillNames">填入名次（跟行序 1→10）</button></div>
         </div>
         <div>
-          <h3>批量貼上：講解題目（每行一題）</h3>
-          <textarea id="bulkTopics" rows="6" placeholder="題目一&#10;題目二&#10;…（10 行）"></textarea>
-          <div class="row"><button class="btn" id="btnFillTopics">填入題目（跟行序 1→10）</button></div>
+          <h3>批量貼上：講題主題（每行一項）</h3>
+          <textarea id="bulkTopics" rows="6" placeholder="主題一&#10;主題二&#10;…（10 行）"></textarea>
+          <div class="row"><button class="btn" id="btnFillTopics">填入講題主題（跟行序 1→10）</button></div>
         </div>
       </div>
 
       <div class="actions">
         <button class="btn primary big" id="btnGoDraw">開始抽籤 →</button>
-        <button class="btn ghost" id="btnClearGroup">清空本組（名次＋題目＋抽籤結果）</button>
+        <button class="btn ghost" id="btnClearGroup">清空本組（名次＋講題主題＋抽籤結果）</button>
       </div>
     </div>
   </section>
@@ -261,7 +261,7 @@ body.present #presentExit:hover{opacity:1}
 
       <div class="stage">
         <div class="panel name" id="panelName"><h3>名次</h3><div class="val" id="valName">--</div></div>
-        <div class="panel topic" id="panelTopic"><h3>講解題目</h3><div class="val" id="valTopic">--</div></div>
+        <div class="panel topic" id="panelTopic"><h3>講題主題</h3><div class="val" id="valTopic">--</div></div>
       </div>
 
       <div class="actions">
@@ -384,7 +384,7 @@ function buildSetupRows(){
   for(var i=0;i<N;i++){
     html+='<tr>'+
       '<td><input type="text" data-kind="names" data-i="'+i+'" autocomplete="off" placeholder="名次 '+(i+1)+'"></td>'+
-      '<td><input type="text" data-kind="topics" data-i="'+i+'" autocomplete="off" placeholder="講解題目 '+(i+1)+'"></td>'+
+      '<td><input type="text" data-kind="topics" data-i="'+i+'" autocomplete="off" placeholder="講題主題 '+(i+1)+'"></td>'+
     '</tr>';
   }
   tb.innerHTML=html;
@@ -419,7 +419,7 @@ function fillBulk(kind, taId){
 }
 function clearGroup(){
   var grp=G();
-  if(!confirm("清空【"+LABEL[S.active]+"】嘅名次、題目同抽籤結果？此動作無法復原。")) return;
+  if(!confirm("清空【"+LABEL[S.active]+"】嘅名次、講題主題同抽籤結果？此動作無法復原。")) return;
   S.groups[S.active]=emptyGroup(); persist(); renderAll(); toast("已清空 "+LABEL[S.active]);
 }
 
@@ -437,7 +437,7 @@ function buildPlan(grp){
 function validate(grp){
   for(var i=0;i<N;i++){
     if(!String(grp.names[i]).trim()) return "第 "+(i+1)+" 行未填名次";
-    if(!String(grp.topics[i]).trim()) return "題目 "+(i+1)+" 未填";
+    if(!String(grp.topics[i]).trim()) return "講題主題 "+(i+1)+" 未填";
   }
   return "";
 }
@@ -508,7 +508,7 @@ function saveGroup(){
 function resetDraw(){
   var grp=G();
   if(!grp.plan) { toast("本組未開始抽籤"); return; }
-  if(!confirm("重新抽籤【"+LABEL[S.active]+"】？（名次同題目會保留，抽籤結果會清空）")) return;
+  if(!confirm("重新抽籤【"+LABEL[S.active]+"】？（名次同講題主題會保留，抽籤結果會清空）")) return;
   grp.plan=null; grp.step=0; grp.draws=[]; grp.saved=false; grp.savedAt=""; grp.seed=null;
   persist(); renderAll(); toast("已重置，可以重新抽");
 }
@@ -562,7 +562,7 @@ function colHtml(key){
     html+='<div class="empty">尚未抽籤（'+(grp.names.some(function(s){return String(s).trim();})?'已輸入名單，未開始抽':'未輸入名單')+'）</div>';
     return html;
   }
-  html+='<table><thead><tr><th style="width:96px">出場順序</th><th style="width:132px">名次</th><th>講解題目</th></tr></thead><tbody>';
+  html+='<table><thead><tr><th style="width:96px">出場順序</th><th style="width:132px">名次</th><th>講題主題</th></tr></thead><tbody>';
   rows.forEach(function(d){
     html+='<tr><td class="k">'+d.k+'</td><td class="nm">'+esc(d.name)+'</td><td>'+esc(d.topic)+'</td></tr>';
   });
@@ -570,7 +570,7 @@ function colHtml(key){
   html+='<div class="meta">'+
     (grp.saved? '<span class="stamp">已儲存 '+fmtDate(grp.savedAt)+'</span>' : '<span class="stamp todo">未儲存</span>')+
     '　共 '+rows.length+' / 10 位　·　亂數種子 '+grp.seed+
-    '　·　名次'+(grp.order==="rand"?"隨機出場":"依 1→10 出場")+'／題目'+(grp.pair==="rand"?"隨機抽題":"跟出場序對應")+
+    '　·　名次'+(grp.order==="rand"?"隨機出場":"依 1→10 出場")+'／主題'+(grp.pair==="rand"?"隨機抽題":"跟出場序對應")+
   '</div>';
   return html;
 }
