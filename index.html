@@ -134,7 +134,7 @@ button.btn.big{font-size:19px;padding:16px 34px;border-radius:16px}
 .col table{width:100%;border-collapse:collapse;font-size:14px}
 .col table th{font-size:11.5px;color:#5b7fa6;text-align:left;border-bottom:2px solid var(--line);padding:6px 6px}
 .col table td{padding:8px 6px;border-bottom:1px dashed #e7eff7;vertical-align:top}
-.col table td.k{width:34px;font-weight:900;color:var(--blue2)}
+.col table td.k{width:64px;font-weight:900;color:var(--blue2)}
 .col table td.nm{font-weight:700;white-space:nowrap}
 .col .empty{color:#a9bccd;font-size:13.5px;padding:10px 4px}
 .col .meta{margin-top:10px;font-size:11.5px;color:#93a9bd}
@@ -150,6 +150,34 @@ button.btn.big{font-size:19px;padding:16px 34px;border-radius:16px}
   .topbar{flex-wrap:wrap}
   .grouptabs .badge{margin-left:0;width:100%}
 }
+/* ---------- 全螢幕展示模式（只顯示兩個組別 + 海報背景）---------- */
+#presentExit{display:none}
+body.present{overflow:hidden;background:#0b2a52}
+body.present .wrap{max-width:none;padding:0}
+body.present .topbar,body.present nav.views,body.present .grouptabs,
+body.present .card h2,body.present #resultHint,body.present .noprint,
+body.present .col .meta,body.present #view-setup,body.present #view-draw,
+body.present .toast{display:none !important}
+body.present section#view-result{display:flex !important;align-items:center;justify-content:center;
+  min-height:100vh;min-height:100dvh;width:100%}
+body.present #view-result .card{background:transparent;border:0;box-shadow:none;border-radius:0;
+  padding:2.2vh 2.4vw;margin:0;max-width:none;width:100%}
+body.present .cols{gap:2vw;margin:0 auto !important;max-width:min(1720px,92vw)}
+body.present .col{background:rgba(255,255,255,.97);border:0;border-radius:clamp(16px,2.2vh,30px);
+  padding:1.6vh 1.6vw 2.1vh;box-shadow:0 18px 50px rgba(8,38,74,.30)}
+body.present .col h3{font-size:clamp(20px,3.5vh,44px);gap:12px;margin:0 0 1vh}
+body.present .col h3 .dot{width:clamp(11px,1.7vh,22px);height:clamp(11px,1.7vh,22px)}
+body.present .col table{font-size:clamp(16px,2.5vh,36px)}
+body.present .col table th{font-size:clamp(11px,1.65vh,21px);padding:.3vh 8px .5vh}
+body.present .col table td{padding:clamp(5px,1.05vh,15px) 8px}
+body.present .col table td.k{width:auto;font-weight:900;color:#0b57a4}
+body.present .col table td.nm{white-space:nowrap}
+body.present .col .empty{font-size:clamp(16px,2.4vh,32px)}
+body.present #presentExit{display:block;position:fixed;right:clamp(12px,1.6vw,26px);bottom:clamp(10px,1.6vh,22px);
+  z-index:80;background:rgba(6,32,66,.72);color:#fff;border:0;border-radius:999px;
+  padding:10px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+  opacity:.28;transition:opacity .25s}
+body.present #presentExit:hover{opacity:1}
 @media print{
   body{background:#fff}
   body::before,body::after,.topbar,nav.views,.grouptabs,.noprint,.toast{display:none !important}
@@ -266,7 +294,8 @@ button.btn.big{font-size:19px;padding:16px 34px;border-radius:16px}
       <h2>抽籤結果總覽</h2>
       <p class="hint" id="resultHint"></p>
       <div class="actions noprint">
-        <button class="btn primary" id="btnPrint">🖨 列印 / 儲存 PDF</button>
+        <button class="btn primary" id="btnPresent">🖥 全螢幕展示（只顯示兩組＋背景）</button>
+        <button class="btn" id="btnPrint">🖨 列印 / 儲存 PDF</button>
         <button class="btn" id="btnCopy">📋 複製文字</button>
         <button class="btn" id="btnExport">⬇ 匯出 JSON 備份</button>
         <button class="btn" id="btnImportBtn">⬆ 匯入 JSON</button>
@@ -283,6 +312,7 @@ button.btn.big{font-size:19px;padding:16px 34px;border-radius:16px}
 </div>
 <div id="confetti"></div>
 <div class="toast" id="toast"></div>
+<button id="presentExit" type="button">✕ 結束展示（Esc）</button>
 
 <script>
 (function(){
@@ -542,15 +572,15 @@ function colHtml(key){
     html+='<div class="empty">尚未抽籤（'+(grp.names.some(function(s){return String(s).trim();})?'已輸入名單，未開始抽':'未輸入名單')+'）</div>';
     return html;
   }
-  html+='<table><thead><tr><th style="width:40px">出场</th><th style="width:48px">序號</th><th style="width:110px">姓名</th><th>講解題目</th></tr></thead><tbody>';
+  html+='<table><thead><tr><th style="width:96px">出場順序</th><th style="width:132px">姓名</th><th>講解題目</th></tr></thead><tbody>';
   rows.forEach(function(d){
-    html+='<tr><td class="k">'+d.k+'</td><td>'+d.serial+'</td><td class="nm">'+esc(d.name)+'</td><td>'+esc(d.topic)+'</td></tr>';
+    html+='<tr><td class="k">'+d.k+'</td><td class="nm">'+esc(d.name)+'</td><td>'+esc(d.topic)+'</td></tr>';
   });
   html+='</tbody></table>';
   html+='<div class="meta">'+
     (grp.saved? '<span class="stamp">已儲存 '+fmtDate(grp.savedAt)+'</span>' : '<span class="stamp todo">未儲存</span>')+
     '　共 '+rows.length+' / 10 位　·　亂數種子 '+grp.seed+
-    '　·　姓名'+(grp.order==="rand"?"隨機":"跟序號")+'／題目'+(grp.pair==="rand"?"隨機抽題":"跟序號對應")+
+    '　·　姓名'+(grp.order==="rand"?"隨機出場":"依 1→10 出場")+'／題目'+(grp.pair==="rand"?"隨機抽題":"跟出場序對應")+
   '</div>';
   return html;
 }
@@ -567,7 +597,7 @@ function plainText(){
     var grp=S.groups[k];
     L.push("【"+LABEL[k]+"】"+(grp.saved?"":"（未儲存）"));
     if(!grp.draws.length){ L.push("　未抽籤"); L.push(""); return; }
-    grp.draws.forEach(function(d){ L.push("　"+d.k+". 序號"+d.serial+"　"+d.name+"　—　"+d.topic); });
+    grp.draws.forEach(function(d){ L.push("　"+d.k+". "+d.name+"　—　"+d.topic); });
     L.push("");
   });
   return "2026粵港澳氣象小主播大賽 · 澳門區選拔賽（抽籤結果）\n\n"+L.join("\n");
@@ -664,6 +694,23 @@ function bind(){
   });
   $("btnMute").addEventListener("click",function(){ S.mute=!S.mute; persist(); renderAll(); });
   $("btnPrint").addEventListener("click",function(){ window.print(); });
+
+  /* ---- 全螢幕展示 ---- */
+  function enterPresent(){
+    setView("result");
+    document.body.classList.add("present");
+    var d=document.documentElement;
+    if(d.requestFullscreen) { try{ d.requestFullscreen(); }catch(e){} }
+  }
+  function leavePresent(){
+    document.body.classList.remove("present");
+    if(document.fullscreenElement && document.exitFullscreen){ try{ document.exitFullscreen(); }catch(e){} }
+  }
+  $("btnPresent").addEventListener("click",enterPresent);
+  $("presentExit").addEventListener("click",leavePresent);
+  document.addEventListener("fullscreenchange",function(){
+    if(!document.fullscreenElement) document.body.classList.remove("present");
+  });
   $("btnCopy").addEventListener("click",copyText);
   $("btnExport").addEventListener("click",exportJson);
   $("btnImportBtn").addEventListener("click",function(){ $("fileImport").click(); });
@@ -678,6 +725,7 @@ function bind(){
   document.addEventListener("keydown",function(e){
     var tag=(e.target.tagName||"").toLowerCase();
     if(tag==="input"||tag==="textarea"||tag==="select") return;
+    if(e.key==="Escape" && document.body.classList.contains("present")){ leavePresent(); return; }
     if(e.code==="Space"||e.key===" "||e.key==="Enter"){
       if(S.view==="draw"){ e.preventDefault(); drawNext(); }
     }
